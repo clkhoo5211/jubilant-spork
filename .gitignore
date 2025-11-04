@@ -37,3 +37,6 @@ web/node_modules/
 node_modules/
 web/dist/
 web/.vite/
+
+# Markdown files (excluded from repository)
+*.md
