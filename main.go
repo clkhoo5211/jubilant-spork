@@ -10,6 +10,7 @@ import (
     "nofx/pool"
     "os"
     "os/signal"
+    "strconv"
     "strings"
     "syscall"
     "time"
@@ -35,6 +36,15 @@ func main() {
 
 	log.Printf("✓ 配置加载成功，共%d个trader参赛", len(cfg.Traders))
 	fmt.Println()
+
+	// Check for PORT environment variable (required for Render, Heroku, etc.)
+	if portEnv := os.Getenv("PORT"); portEnv != "" {
+		port, err := strconv.Atoi(portEnv)
+		if err == nil {
+			cfg.APIServerPort = port
+			log.Printf("✓ 使用环境变量 PORT: %d", port)
+		}
+	}
 
 	// 初始化市场数据提供者
 	market.InitializeProviders()
