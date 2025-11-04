@@ -163,7 +163,8 @@ cat >> "$CONFIG_FILE" << 'EOF'
     "safety_buffer_pct": 5.0,
     "check_available_before_open": true
   },
-  "web_password": "${WEB_PASSWORD:-admin123}"
+  "web_username": "admin",
+  "web_password": "admin123"
 }
 EOF
 
