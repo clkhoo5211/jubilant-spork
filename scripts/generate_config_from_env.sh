@@ -139,6 +139,7 @@ EOF
 fi
 
 # Close traders array and add global config
+# Note: If no traders were added, we still have a valid JSON with empty array
 cat >> "$CONFIG_FILE" << 'EOF'
   ],
   "leverage": {
@@ -166,14 +167,25 @@ cat >> "$CONFIG_FILE" << 'EOF'
 EOF
 
 # Replace default values with environment variables if set
-if [ -n "$LEVERAGE_BTC_ETH" ]; then
+if [ -n "${LEVERAGE_BTC_ETH:-}" ]; then
   sed -i.bak "s/\"btc_eth_leverage\": 5/\"btc_eth_leverage\": $LEVERAGE_BTC_ETH/" "$CONFIG_FILE" && rm -f "$CONFIG_FILE.bak" 2>/dev/null || true
 fi
-if [ -n "$LEVERAGE_ALTCOIN" ]; then
+if [ -n "${LEVERAGE_ALTCOIN:-}" ]; then
   sed -i.bak "s/\"altcoin_leverage\": 5/\"altcoin_leverage\": $LEVERAGE_ALTCOIN/" "$CONFIG_FILE" && rm -f "$CONFIG_FILE.bak" 2>/dev/null || true
 fi
-if [ -n "$API_SERVER_PORT" ]; then
+if [ -n "${API_SERVER_PORT:-}" ]; then
   sed -i.bak "s/\"api_server_port\": 8080/\"api_server_port\": $API_SERVER_PORT/" "$CONFIG_FILE" && rm -f "$CONFIG_FILE.bak" 2>/dev/null || true
+fi
+
+# Validate JSON
+if ! python3 -m json.tool "$CONFIG_FILE" > /dev/null 2>&1 && ! command -v jq > /dev/null 2>&1; then
+  echo "⚠️  Warning: Could not validate JSON (python3/jq not available)"
+else
+  if command -v jq > /dev/null 2>&1; then
+    jq . "$CONFIG_FILE" > /dev/null 2>&1 || (echo "❌ JSON validation failed" && exit 1)
+  elif command -v python3 > /dev/null 2>&1; then
+    python3 -m json.tool "$CONFIG_FILE" > /dev/null 2>&1 || (echo "❌ JSON validation failed" && exit 1)
+  fi
 fi
 
 echo "✅ Config file generated: $CONFIG_FILE"
