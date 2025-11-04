@@ -38,5 +38,6 @@ node_modules/
 web/dist/
 web/.vite/
 
-# Markdown files (excluded from repository)
+# Markdown files (excluded from repository, except README.md)
 *.md
+!README.md
