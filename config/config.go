@@ -80,6 +80,8 @@ type Config struct {
     Leverage           LeverageConfig   `json:"leverage"`           // 杠杆配置
     PositionSize       PositionSizeConfig `json:"position_size"`   // 仓位大小配置
     MarketDataProvider string           `json:"market_data_provider"` // 市场数据源: "binance", "gateio", "okx", "bybit", etc. (default: "binance")
+    WebUsername        string           `json:"web_username"`         // Web dashboard username (for frontend login)
+    WebPassword        string           `json:"web_password"`         // Web dashboard password (for frontend login)
 
     // 决策日志清理配置（全局设置，适用于所有trader）
     DecisionLogRetentionDays        int `json:"decision_log_retention_days"`         // 保留决策日志的天数（默认30）

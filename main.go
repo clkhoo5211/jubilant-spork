@@ -141,7 +141,7 @@ func main() {
 	fmt.Println()
 
 	// 创建并启动API服务器
-	apiServer := api.NewServer(traderManager, cfg.APIServerPort)
+	apiServer := api.NewServer(traderManager, cfg.APIServerPort, cfg.WebUsername, cfg.WebPassword)
 	go func() {
 		if err := apiServer.Start(); err != nil {
 			log.Printf("❌ API服务器错误: %v", err)

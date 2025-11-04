@@ -154,7 +154,7 @@ cat >> "$CONFIG_FILE" << 'EOF'
   "max_daily_loss": 10.0,
   "max_drawdown": 20.0,
   "stop_trading_minutes": 60,
-  "market_data_provider": "binance",
+  "market_data_provider": "${MARKET_DATA_PROVIDER:-binance}",
   "position_size": {
     "min_position_size_usd": 0,
     "max_position_size_usd": 150,
@@ -162,7 +162,8 @@ cat >> "$CONFIG_FILE" << 'EOF'
     "max_position_size_mult": 1.5,
     "safety_buffer_pct": 5.0,
     "check_available_before_open": true
-  }
+  },
+  "web_password": "${WEB_PASSWORD:-admin123}"
 }
 EOF
 
@@ -175,6 +176,15 @@ if [ -n "${LEVERAGE_ALTCOIN:-}" ]; then
 fi
 if [ -n "${API_SERVER_PORT:-}" ]; then
   sed -i.bak "s/\"api_server_port\": 8080/\"api_server_port\": $API_SERVER_PORT/" "$CONFIG_FILE" && rm -f "$CONFIG_FILE.bak" 2>/dev/null || true
+fi
+if [ -n "${WEB_USERNAME:-}" ]; then
+  sed -i.bak "s/\"web_username\": \"admin\"/\"web_username\": \"$WEB_USERNAME\"/" "$CONFIG_FILE" && rm -f "$CONFIG_FILE.bak" 2>/dev/null || true
+fi
+if [ -n "${WEB_PASSWORD:-}" ]; then
+  sed -i.bak "s/\"web_password\": \"admin123\"/\"web_password\": \"$WEB_PASSWORD\"/" "$CONFIG_FILE" && rm -f "$CONFIG_FILE.bak" 2>/dev/null || true
+fi
+if [ -n "${MARKET_DATA_PROVIDER:-}" ]; then
+  sed -i.bak "s/\"market_data_provider\": \"binance\"/\"market_data_provider\": \"$MARKET_DATA_PROVIDER\"/" "$CONFIG_FILE" && rm -f "$CONFIG_FILE.bak" 2>/dev/null || true
 fi
 
 # Validate JSON

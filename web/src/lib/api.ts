@@ -114,4 +114,18 @@ export const api = {
     if (!res.ok) throw new Error('获取AI学习数据失败');
     return res.json();
   },
+
+  // 登录认证
+  async login(username: string, password: string): Promise<boolean> {
+    const res = await fetch(`${API_BASE}/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.success === true;
+  },
 };

@@ -14,10 +14,12 @@ type Server struct {
 	router        *gin.Engine
 	traderManager *manager.TraderManager
 	port          int
+	webUsername   string // Web dashboard username
+	webPassword   string // Web dashboard password
 }
 
 // NewServer 创建API服务器
-func NewServer(traderManager *manager.TraderManager, port int) *Server {
+func NewServer(traderManager *manager.TraderManager, port int, webUsername, webPassword string) *Server {
 	// 设置为Release模式（减少日志输出）
 	gin.SetMode(gin.ReleaseMode)
 
@@ -30,6 +32,8 @@ func NewServer(traderManager *manager.TraderManager, port int) *Server {
 		router:        router,
 		traderManager: traderManager,
 		port:          port,
+		webUsername:   webUsername,
+		webPassword:   webPassword,
 	}
 
 	// 设置路由
@@ -62,6 +66,9 @@ func (s *Server) setupRoutes() {
 	// API路由组
 	api := s.router.Group("/api")
 	{
+		// 登录认证（公开端点，不需要密码）
+		api.POST("/login", s.handleLogin)
+
 		// 竞赛总览
 		api.GET("/competition", s.handleCompetition)
 
@@ -86,6 +93,45 @@ func (s *Server) handleHealth(c *gin.Context) {
 		"status": "ok",
 		"time":   c.Request.Context().Value("time"),
 	})
+}
+
+// handleLogin 处理登录请求
+func (s *Server) handleLogin(c *gin.Context) {
+	var req struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "Invalid request",
+		})
+		return
+	}
+
+	// 如果未设置用户名和密码，则允许任何登录（向后兼容）
+	if s.webUsername == "" && s.webPassword == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+		})
+		return
+	}
+
+	// 验证用户名和密码
+	usernameMatch := s.webUsername == "" || req.Username == s.webUsername
+	passwordMatch := s.webPassword == "" || req.Password == s.webPassword
+
+	if usernameMatch && passwordMatch {
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+		})
+	} else {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "Invalid username or password",
+		})
+	}
 }
 
 // getTraderFromQuery 从query参数获取trader

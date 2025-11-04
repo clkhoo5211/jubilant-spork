@@ -3,8 +3,10 @@ import useSWR from 'swr';
 import { api } from './lib/api';
 import { EquityChart } from './components/EquityChart';
 import { CompetitionPage } from './components/CompetitionPage';
+import { LoginPage } from './components/LoginPage';
 import AILearning from './components/AILearning';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { t, type Language } from './i18n/translations';
 import type {
   SystemStatus,
@@ -19,6 +21,12 @@ type Page = 'competition' | 'trader';
 
 function App() {
   const { language, setLanguage } = useLanguage();
+  const { isAuthenticated } = useAuth();
+
+  // Show login page if not authenticated
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
 
   // 从URL hash读取初始页面状态（支持刷新保持页面）
   const getInitialPage = (): Page => {
@@ -689,11 +697,13 @@ function DecisionCard({ decision, language }: { decision: DecisionRecord; langua
   );
 }
 
-// Wrap App with LanguageProvider
+// Wrap App with LanguageProvider and AuthProvider
 export default function AppWithLanguage() {
   return (
     <LanguageProvider>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </LanguageProvider>
   );
 }
