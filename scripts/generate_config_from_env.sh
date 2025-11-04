@@ -175,7 +175,7 @@ cat >> "$CONFIG_FILE" << 'EOF'
   "max_daily_loss": 10.0,
   "max_drawdown": 20.0,
   "stop_trading_minutes": 60,
-  "market_data_provider": "${MARKET_DATA_PROVIDER:-binance}",
+  "market_data_provider": "binance",
   "position_size": {
     "min_position_size_usd": 0,
     "max_position_size_usd": 150,
@@ -207,6 +207,9 @@ if [ -n "${WEB_PASSWORD:-}" ]; then
 fi
 if [ -n "${MARKET_DATA_PROVIDER:-}" ]; then
   sed -i.bak "s/\"market_data_provider\": \"binance\"/\"market_data_provider\": \"$MARKET_DATA_PROVIDER\"/" "$CONFIG_FILE" && rm -f "$CONFIG_FILE.bak" 2>/dev/null || true
+else
+  # Ensure default is set if not provided
+  sed -i.bak "s/\"market_data_provider\": \"\${MARKET_DATA_PROVIDER:-binance}\"/\"market_data_provider\": \"binance\"/" "$CONFIG_FILE" && rm -f "$CONFIG_FILE.bak" 2>/dev/null || true
 fi
 
 # Validate JSON
