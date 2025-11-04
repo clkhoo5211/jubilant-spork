@@ -2,6 +2,7 @@ package market
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -71,8 +72,11 @@ func Get(symbol string) (*Data, error) {
 
 // GetWithProvider 使用指定的provider获取市场数据
 func GetWithProvider(symbol string, provider MarketDataProvider) (*Data, error) {
+	providerName := provider.GetName()
+	log.Printf("📊 [市场数据] 使用 %s 获取 %s 的市场数据", providerName, symbol)
+	
 	// 标准化symbol (使用provider的标准化方法)
-	symbol = provider.NormalizeSymbol(symbol)
+	normalizedSymbol := provider.NormalizeSymbol(symbol)
 
 	// 获取3分钟K线数据 (最近10个)
 	klines3m, err := provider.GetKlines(symbol, "3m", 40) // 多获取一些用于计算
@@ -127,8 +131,11 @@ func GetWithProvider(symbol string, provider MarketDataProvider) (*Data, error) 
 	// 计算长期数据
 	longerTermData := calculateLongerTermData(klines4h)
 
+	log.Printf("✓ [市场数据] %s (%s) 数据获取完成: 价格=%.2f, EMA20=%.2f, MACD=%.4f, RSI7=%.2f", 
+		symbol, providerName, currentPrice, currentEMA20, currentMACD, currentRSI7)
+
 	return &Data{
-		Symbol:            symbol,
+		Symbol:            normalizedSymbol,
 		CurrentPrice:      currentPrice,
 		PriceChange1h:     priceChange1h,
 		PriceChange4h:     priceChange4h,

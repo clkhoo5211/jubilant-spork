@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -95,6 +96,7 @@ func (p *GateioProvider) getIntervalSeconds(interval string) int64 {
 
 // GetKlines fetches candlestick data from Gate.io
 func (p *GateioProvider) GetKlines(symbol, interval string, limit int) ([]Kline, error) {
+	originalSymbol := symbol
 	symbol = p.NormalizeSymbol(symbol)
 	interval = p.convertInterval(interval)
 
@@ -102,6 +104,8 @@ func (p *GateioProvider) GetKlines(symbol, interval string, limit int) ([]Kline,
 	// Build URL with proper query encoding
 	apiURL := fmt.Sprintf("%s/futures/usdt/candlesticks?contract=%s&interval=%s&limit=%d",
 		p.baseURL, url.QueryEscape(symbol), interval, limit)
+
+	log.Printf("📊 [Gate.io] 获取K线数据: %s (%s) -> %s, 间隔=%s, 数量=%d", originalSymbol, symbol, apiURL, interval, limit)
 
 	resp, err := http.Get(apiURL)
 	if err != nil {
@@ -152,13 +156,21 @@ func (p *GateioProvider) GetKlines(symbol, interval string, limit int) ([]Kline,
 		}
 	}
 
+	if len(klines) > 0 {
+		latestPrice := klines[len(klines)-1].Close
+		log.Printf("✓ [Gate.io] 成功获取 %s K线数据: %d根, 最新价格=%.2f", originalSymbol, len(klines), latestPrice)
+	}
+
 	return klines, nil
 }
 
 // GetOpenInterest fetches open interest data from Gate.io
 func (p *GateioProvider) GetOpenInterest(symbol string) (*OIData, error) {
+	originalSymbol := symbol
 	symbol = p.NormalizeSymbol(symbol)
 	apiURL := fmt.Sprintf("%s/futures/usdt/contracts/%s", p.baseURL, symbol)
+
+	log.Printf("📊 [Gate.io] 获取持仓量数据: %s -> %s", originalSymbol, symbol)
 
 	resp, err := http.Get(apiURL)
 	if err != nil {
@@ -188,10 +200,12 @@ func (p *GateioProvider) GetOpenInterest(symbol string) (*OIData, error) {
 		oi = parseFloatSafe(result["open_interest"])
 	}
 
-	return &OIData{
+	oiData := &OIData{
 		Latest:  oi,
 		Average: oi * 0.999, // Approximate average
-	}, nil
+	}
+	log.Printf("✓ [Gate.io] 成功获取 %s 持仓量: %.2f", originalSymbol, oi)
+	return oiData, nil
 }
 
 // GetFundingRate fetches funding rate from Gate.io
