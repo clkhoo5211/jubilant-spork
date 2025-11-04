@@ -54,6 +54,13 @@ EOF
       "custom_model_name": "${TRADER_1_CUSTOM_MODEL_NAME:-gemini-2.5-flash}",
       "initial_balance": ${TRADER_1_INITIAL_BALANCE:-4618.06},
       "scan_interval_minutes": ${TRADER_1_SCAN_INTERVAL:-3}
+EOF
+  # Add system_prompt_template if set
+  if [ -n "${TRADER_1_SYSTEM_PROMPT_TEMPLATE:-}" ]; then
+    echo "      ," >> "$CONFIG_FILE"
+    echo "      \"system_prompt_template\": \"${TRADER_1_SYSTEM_PROMPT_TEMPLATE}\"" >> "$CONFIG_FILE"
+  fi
+  cat >> "$CONFIG_FILE" << 'EOF'
     }
 EOF
 fi
@@ -94,6 +101,13 @@ EOF
       "custom_model_name": "${TRADER_2_CUSTOM_MODEL_NAME:-gemini-2.5-flash-lite}",
       "initial_balance": ${TRADER_2_INITIAL_BALANCE:-2021.33},
       "scan_interval_minutes": ${TRADER_2_SCAN_INTERVAL:-3}
+EOF
+  # Add system_prompt_template if set
+  if [ -n "${TRADER_2_SYSTEM_PROMPT_TEMPLATE:-}" ]; then
+    echo "      ," >> "$CONFIG_FILE"
+    echo "      \"system_prompt_template\": \"${TRADER_2_SYSTEM_PROMPT_TEMPLATE}\"" >> "$CONFIG_FILE"
+  fi
+  cat >> "$CONFIG_FILE" << 'EOF'
     }
 EOF
 fi
@@ -134,6 +148,13 @@ EOF
       "custom_model_name": "${TRADER_3_CUSTOM_MODEL_NAME:-gemini-flash-latest}",
       "initial_balance": ${TRADER_3_INITIAL_BALANCE:-4918.66},
       "scan_interval_minutes": ${TRADER_3_SCAN_INTERVAL:-3}
+EOF
+  # Add system_prompt_template if set
+  if [ -n "${TRADER_3_SYSTEM_PROMPT_TEMPLATE:-}" ]; then
+    echo "      ," >> "$CONFIG_FILE"
+    echo "      \"system_prompt_template\": \"${TRADER_3_SYSTEM_PROMPT_TEMPLATE}\"" >> "$CONFIG_FILE"
+  fi
+  cat >> "$CONFIG_FILE" << 'EOF'
     }
 EOF
 fi

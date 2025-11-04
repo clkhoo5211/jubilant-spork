@@ -83,11 +83,21 @@ func GetWithProvider(symbol string, provider MarketDataProvider) (*Data, error) 
 	if err != nil {
 		return nil, fmt.Errorf("获取3分钟K线失败: %v", err)
 	}
+	
+	// 检查3分钟K线数据是否为空
+	if len(klines3m) == 0 {
+		return nil, fmt.Errorf("3分钟K线数据为空: %s", symbol)
+	}
 
 	// 获取4小时K线数据 (最近10个)
 	klines4h, err := provider.GetKlines(symbol, "4h", 60) // 多获取用于计算指标
 	if err != nil {
 		return nil, fmt.Errorf("获取4小时K线失败: %v", err)
+	}
+	
+	// 检查4小时K线数据是否为空
+	if len(klines4h) == 0 {
+		return nil, fmt.Errorf("4小时K线数据为空: %s", symbol)
 	}
 
 	// 计算当前指标 (基于3分钟最新数据)

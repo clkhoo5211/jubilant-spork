@@ -69,6 +69,7 @@ func (tm *TraderManager) AddTrader(cfg config.TraderConfig, coinPoolURL string, 
 		MaxDailyLoss:          maxDailyLoss,
 		MaxDrawdown:           maxDrawdown,
 		StopTradingTime:       time.Duration(stopTradingMinutes) * time.Minute,
+		SystemPromptTemplate:  cfg.SystemPromptTemplate, // 系统提示词模板名称
 	}
 
 	// 创建trader实例

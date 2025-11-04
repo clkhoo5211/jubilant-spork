@@ -48,6 +48,9 @@ type TraderConfig struct {
 
 	InitialBalance      float64 `json:"initial_balance"`
 	ScanIntervalMinutes int     `json:"scan_interval_minutes"`
+	
+	// Prompt template configuration (optional)
+	SystemPromptTemplate string `json:"system_prompt_template,omitempty"` // 系统提示词模板名称 (如 "default", "adaptive", "nof1", "taro_long_prompts")
 }
 
 // LeverageConfig 杠杆配置

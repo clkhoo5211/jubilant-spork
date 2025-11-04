@@ -70,6 +70,7 @@ type Context struct {
 	AltcoinLeverage     int     `json:"-"` // 山寨币杠杆倍数（从配置读取）
 	MinPositionSizeUSD  float64 `json:"-"` // 最小仓位大小（USD，0表示不限制）
 	MaxPositionSizeUSD  float64 `json:"-"` // 最大仓位大小（USD，0表示不限制）
+	SystemPromptTemplate string `json:"-"` // 系统提示词模板名称 (如 "default", "adaptive", "nof1")
 }
 
 // Decision AI的交易决策
@@ -101,7 +102,13 @@ func GetFullDecision(ctx *Context, mcpClient *mcp.Client) (*FullDecision, error)
 	}
 
 	// 2. 构建 System Prompt（固定规则）和 User Prompt（动态数据）
-	systemPrompt := buildSystemPrompt(ctx.Account.TotalEquity, ctx.BTCETHLeverage, ctx.AltcoinLeverage, ctx.MinPositionSizeUSD, ctx.MaxPositionSizeUSD)
+	// Try to use prompt template first (upstream method), fallback to existing buildSystemPrompt if nil/not found
+	// Use template name from context if specified, otherwise use "default"
+	templateName := ctx.SystemPromptTemplate
+	if templateName == "" {
+		templateName = "default" // Default template name
+	}
+	systemPrompt := buildSystemPromptWithFallback(ctx.Account.TotalEquity, ctx.BTCETHLeverage, ctx.AltcoinLeverage, ctx.MinPositionSizeUSD, ctx.MaxPositionSizeUSD, templateName)
 	userPrompt := buildUserPrompt(ctx)
 
 	// 3. 调用AI API（使用 system + user prompt）
@@ -383,6 +390,28 @@ func buildSystemPrompt(accountEquity float64, btcEthLeverage, altcoinLeverage in
 	sb.WriteString("- ⚠️ 做空时：stop_loss > entry_price > take_profit （这是验证规则）\n")
 
 	return sb.String()
+}
+
+// buildSystemPromptWithFallback 构建 System Prompt，优先使用模板，失败时回退到现有方法
+// Uses upstream prompt_manager method as default, falls back to existing buildSystemPrompt if template is nil/not found
+// templateName: 模板名称，如 "default", "adaptive", "nof1", "taro_long_prompts" (如果为空则使用 "default")
+func buildSystemPromptWithFallback(accountEquity float64, btcEthLeverage, altcoinLeverage int, minPositionSizeUSD, maxPositionSizeUSD float64, templateName string) string {
+	// Default to "default" if templateName is empty
+	if templateName == "" {
+		templateName = "default"
+	}
+	
+	// Try to get prompt template from prompt_manager (upstream method) as default
+	template, err := GetPromptTemplate(templateName)
+	if err == nil && template != nil && template.Content != "" {
+		// Use template from prompt_manager (upstream method) as default
+		log.Printf("✓ 使用提示词模板: %s (upstream方法)", templateName)
+		return template.Content
+	}
+	
+	// Fallback to existing buildSystemPrompt behavior if template is nil/not found
+	log.Printf("⚠️  提示词模板 '%s' 不可用，回退到内置prompt构建方法: %v", templateName, err)
+	return buildSystemPrompt(accountEquity, btcEthLeverage, altcoinLeverage, minPositionSizeUSD, maxPositionSizeUSD)
 }
 
 // buildUserPrompt 构建 User Prompt（动态数据）

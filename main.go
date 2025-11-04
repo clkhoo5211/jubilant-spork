@@ -35,6 +35,10 @@ func main() {
 	}
 
 	log.Printf("✓ 配置加载成功，共%d个trader参赛", len(cfg.Traders))
+	
+	// Initialize prompt manager (loads prompts from prompts/ directory)
+	// Note: prompt_manager.go has init() that auto-loads, but we can also explicitly initialize
+	// The init() function will handle loading if prompts directory exists
 	fmt.Println()
 
 	// Check for PORT environment variable (required for Render, Heroku, etc.)

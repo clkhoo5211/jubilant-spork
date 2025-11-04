@@ -77,6 +77,9 @@ type AutoTraderConfig struct {
 	MaxDailyLoss    float64       // 最大日亏损百分比（提示）
 	MaxDrawdown     float64       // 最大回撤百分比（提示）
 	StopTradingTime time.Duration // 触发风控后暂停时长
+	
+	// Prompt template configuration (optional)
+	SystemPromptTemplate string // 系统提示词模板名称 (如 "default", "adaptive", "nof1")
 }
 
 // AutoTrader 自动交易器
@@ -557,6 +560,7 @@ func (at *AutoTrader) buildTradingContext() (*decision.Context, error) {
 		AltcoinLeverage:    at.config.AltcoinLeverage, // 使用配置的杠杆倍数
 		MinPositionSizeUSD: at.config.MinPositionSizeUSD,
 		MaxPositionSizeUSD: at.config.MaxPositionSizeUSD,
+		SystemPromptTemplate: at.config.SystemPromptTemplate, // 系统提示词模板名称
 		Account: decision.AccountInfo{
 			TotalEquity:      totalEquity,
 			AvailableBalance: availableBalance,
