@@ -45,6 +45,9 @@ jobs:
           VITE_API_BASE_URL: ${{ secrets.API_BASE_URL || 'https://your-backend-url.com' }}
         run: npm run build
 
+      - name: Add .nojekyll file
+        run: touch web/dist/.nojekyll
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
