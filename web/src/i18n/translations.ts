@@ -1,0 +1,385 @@
+export type Language = 'en' | 'zh';
+
+export const translations = {
+  en: {
+    // Header
+    appTitle: 'AI Trading Competition',
+    subtitle: 'Qwen vs DeepSeek · Real-time',
+    competition: 'Competition',
+    details: 'Details',
+    running: 'RUNNING',
+    stopped: 'STOPPED',
+
+    // Footer
+    footerTitle: 'NOFX - AI Trading Competition System',
+    footerWarning: '⚠️ Trading involves risk. Use at your own discretion.',
+
+    // Stats Cards
+    totalEquity: 'Total Equity',
+    availableBalance: 'Available Balance',
+    totalPnL: 'Total P&L',
+    positions: 'Positions',
+    activePositions: 'ACTIVE POSITIONS',
+    margin: 'Margin',
+    free: 'Free',
+
+    // Positions Table
+    currentPositions: 'Current Positions',
+    active: 'Active',
+    symbol: 'Symbol',
+    side: 'Side',
+    entryPrice: 'Entry Price',
+    markPrice: 'Mark Price',
+    quantity: 'Quantity',
+    positionValue: 'Position Value',
+    leverage: 'Leverage',
+    unrealizedPnL: 'Unrealized P&L',
+    liqPrice: 'Liq. Price',
+    long: 'LONG',
+    short: 'SHORT',
+    noPositions: 'No Positions',
+    noActivePositions: 'No active trading positions',
+
+    // Recent Decisions
+    recentDecisions: 'Recent Decisions',
+    lastCycles: 'Last {count} trading cycles',
+    noDecisionsYet: 'No Decisions Yet',
+    aiDecisionsWillAppear: 'AI trading decisions will appear here',
+    cycle: 'Cycle',
+    success: 'Success',
+    failed: 'Failed',
+    inputPrompt: 'Input Prompt',
+    aiThinking: 'AI Chain of Thought',
+    collapse: 'Collapse',
+    expand: 'Expand',
+
+    // Equity Chart
+    accountEquityCurve: 'Account Equity Curve',
+    noHistoricalData: 'No Historical Data',
+    dataWillAppear: 'Equity curve will appear after running a few cycles',
+    initialBalance: 'Initial Balance',
+    currentEquity: 'Current Equity',
+    historicalCycles: 'Historical Cycles',
+    displayRange: 'Display Range',
+    recent: 'Recent',
+    allData: 'All Data',
+    cycles: 'Cycles',
+
+    // Competition Page
+    aiCompetition: 'AI Competition',
+    traders: 'traders',
+    liveBattle: 'Qwen vs DeepSeek · Live Battle',
+    leader: 'Leader',
+    leaderboard: 'Leaderboard',
+    live: 'LIVE',
+    performanceComparison: 'Performance Comparison',
+    realTimePnL: 'Real-time PnL %',
+    headToHead: 'Head-to-Head Battle',
+    leadingBy: 'Leading by {gap}%',
+    behindBy: 'Behind by {gap}%',
+    equity: 'Equity',
+    pnl: 'P&L',
+    pos: 'Pos',
+    comparisonMode: 'Comparison Mode',
+    dataPoints: 'Data Points',
+    currentGap: 'Current Gap',
+    loadingComparisonData: 'Loading comparison data...',
+    noComparisonData: 'No Historical Data',
+    comparisonDataWillAppear: 'Comparison curve will appear after running a few cycles',
+    breakEven: 'Break Even',
+    recentCount: 'Recent {count}',
+    unitPoints: 'points',
+
+    // AI Learning
+    aiLearning: 'AI Learning & Reflection',
+    tradesAnalyzed: '{count} trades analyzed · Real-time evolution',
+    latestReflection: 'Latest Reflection',
+    fullCoT: 'Full Chain of Thought',
+    totalTrades: 'Total Trades',
+    winRate: 'Win Rate',
+    avgWin: 'Avg Win',
+    avgLoss: 'Avg Loss',
+    profitFactor: 'Profit Factor',
+    avgWinDivLoss: 'Avg Win ÷ Avg Loss',
+    excellent: '🔥 Excellent - Strong profitability',
+    good: '✓ Good - Stable profits',
+    fair: '⚠️ Fair - Needs optimization',
+    poor: '❌ Poor - Losses exceed gains',
+    bestPerformer: 'Best Performer',
+    worstPerformer: 'Worst Performer',
+    symbolPerformance: 'Symbol Performance',
+    tradeHistory: 'Trade History',
+    completedTrades: 'Recent {count} completed trades',
+    noCompletedTrades: 'No completed trades yet',
+    completedTradesWillAppear: 'Completed trades will appear here',
+    entry: 'Entry',
+    exit: 'Exit',
+    stopLoss: 'Stop Loss',
+    latest: 'Latest',
+    trades: 'Trades',
+    usdtAverage: 'USDT Average',
+    avgPnL: 'Avg P&L (USDT)',
+    marginUsed: 'Margin Used',
+
+    // Sharpe Ratio
+    sharpeRatio: 'Sharpe Ratio',
+    sharpeRatioSubtitle: 'Risk-adjusted return · AI self-evolution indicator',
+    sharpeExcellent: '🟢 Excellent Performance',
+    sharpeGood: '🟢 Good Performance',
+    sharpeVolatile: '🟡 High Volatility',
+    sharpeNeedsAdjustment: '🔴 Needs Adjustment',
+    sharpeExcellentDesc: '✨ AI strategy is very effective! Excellent risk-adjusted returns, can moderately increase position size while maintaining discipline.',
+    sharpeGoodDesc: '✅ Strategy performance is stable, risk-return balance is good, continue maintaining current strategy.',
+    sharpeVolatileDesc: '⚠️ Profitable but highly volatile, AI is optimizing strategy to reduce risk.',
+    sharpeNeedsAdjustmentDesc: '🚨 Current strategy needs adjustment! AI has automatically entered conservative mode, reducing positions and trading frequency.',
+
+    // Profit Factor Descriptions
+    profitFactorExcellentDesc: '🔥 Excellent profitability! For every $1 lost, {factor} can be earned, and the AI strategy performs excellently.',
+    profitFactorGoodDesc: '✓ Strategy is stable and profitable, healthy profit-loss ratio, continue maintaining disciplined trading.',
+    profitFactorFairDesc: '⚠️ Strategy is slightly profitable but needs optimization, AI is adjusting position sizing and stop-loss strategy.',
+    profitFactorPoorDesc: '❌ Average losses exceed gains, need to adjust strategy or reduce trading frequency.',
+
+    // Duration
+    hour: 'h',
+    minute: 'm',
+    second: 's',
+
+    // AI Learning Description
+    howAILearns: 'How AI Learns & Evolves',
+    aiLearningPoint1: 'Analyzes last 20 trading cycles before each decision',
+    aiLearningPoint2: 'Identifies best & worst performing symbols',
+    aiLearningPoint3: 'Optimizes position sizing based on win rate',
+    aiLearningPoint4: 'Avoids repeating past mistakes',
+
+    // Loading & Error
+    loading: 'Loading...',
+    loadingError: '⚠️ Failed to load AI learning data',
+    noCompleteData: 'No complete trading data (needs to complete open → close cycle)',
+
+    // Model Chat
+    modelChat: 'Model Chat',
+    noChatMessagesYet: 'No Chat Messages Yet',
+    chatWillAppear: 'AI decision conversations will appear here',
+    decisionActions: 'Decision Actions',
+    accountState: 'Account State',
+    actions: 'actions',
+    filter: 'FILTER',
+    allModels: 'ALL MODELS',
+    showingRecentMessages: 'Showing recent',
+    messages: 'messages',
+    allModelsChatFeed: 'All models chat feed · Live updates',
+    showMore: 'Show More',
+    showLess: 'Show Less',
+
+    // Tabs
+    leaderboardTab: 'Leaderboard',
+    positionsTab: 'Positions',
+    chatTab: 'Chat',
+    
+    // Positions specific
+    totalUnrealizedPnL: 'Total Unrealized P&L',
+    noActivePositionsCompetition: 'No active positions in competition',
+    view: 'VIEW',
+    notional: 'Notional',
+    exitPlan: 'Exit Plan',
+    unrealizedPnLShort: 'Unreal P&L',
+    availableCash: 'Available Cash',
+  },
+  zh: {
+    // Header
+    appTitle: 'AI交易竞赛',
+    subtitle: 'Qwen vs DeepSeek · 实时',
+    competition: '竞赛',
+    details: '详情',
+    running: '运行中',
+    stopped: '已停止',
+
+    // Footer
+    footerTitle: 'NOFX - AI交易竞赛系统',
+    footerWarning: '⚠️ 交易有风险，请谨慎使用。',
+
+    // Stats Cards
+    totalEquity: '总净值',
+    availableBalance: '可用余额',
+    totalPnL: '总盈亏',
+    positions: '持仓',
+    activePositions: '活跃持仓',
+    margin: '保证金',
+    free: '空闲',
+
+    // Positions Table
+    currentPositions: '当前持仓',
+    active: '活跃',
+    symbol: '币种',
+    side: '方向',
+    entryPrice: '入场价',
+    markPrice: '标记价',
+    quantity: '数量',
+    positionValue: '仓位价值',
+    leverage: '杠杆',
+    unrealizedPnL: '未实现盈亏',
+    liqPrice: '强平价',
+    long: '多头',
+    short: '空头',
+    noPositions: '无持仓',
+    noActivePositions: '当前没有活跃的交易持仓',
+
+    // Recent Decisions
+    recentDecisions: '最近决策',
+    lastCycles: '最近 {count} 个交易周期',
+    noDecisionsYet: '暂无决策',
+    aiDecisionsWillAppear: 'AI交易决策将显示在这里',
+    cycle: '周期',
+    success: '成功',
+    failed: '失败',
+    inputPrompt: '输入提示',
+    aiThinking: '💭 AI思维链分析',
+    collapse: '▼ 收起',
+    expand: '▶ 展开',
+
+    // Equity Chart
+    accountEquityCurve: '账户净值曲线',
+    noHistoricalData: '暂无历史数据',
+    dataWillAppear: '运行几个周期后将显示收益率曲线',
+    initialBalance: '初始余额',
+    currentEquity: '当前净值',
+    historicalCycles: '历史周期',
+    displayRange: '显示范围',
+    recent: '最近',
+    allData: '全部数据',
+    cycles: '个',
+
+    // Competition Page
+    aiCompetition: 'AI竞赛',
+    traders: '位交易者',
+    liveBattle: 'Qwen vs DeepSeek · 实时对战',
+    leader: '🥇 领先者',
+    leaderboard: '🥇 排行榜',
+    live: '直播',
+    performanceComparison: '📈 表现对比',
+    realTimePnL: '实时盈亏百分比',
+    headToHead: '⚔️ 正面对决',
+    leadingBy: '领先 {gap}%',
+    behindBy: '落后 {gap}%',
+    equity: '净值',
+    pnl: '盈亏',
+    pos: '仓位',
+    comparisonMode: '对比模式',
+    dataPoints: '数据点数',
+    currentGap: '当前差距',
+    loadingComparisonData: '加载对比数据中...',
+    noComparisonData: '暂无历史数据',
+    comparisonDataWillAppear: '运行几个周期后将显示对比曲线',
+    breakEven: '盈亏平衡',
+    recentCount: '最近 {count}',
+    unitPoints: '个',
+
+    // AI Learning
+    aiLearning: 'AI学习与反思',
+    tradesAnalyzed: '已分析 {count} 笔交易 · 实时演化',
+    latestReflection: '最新反思',
+    fullCoT: '📋 完整思维链',
+    totalTrades: '总交易数',
+    winRate: '胜率',
+    avgWin: '平均盈利',
+    avgLoss: '平均亏损',
+    profitFactor: '盈亏比',
+    avgWinDivLoss: '平均盈利 ÷ 平均亏损',
+    excellent: '🔥 优秀 - 盈利能力强',
+    good: '✓ 良好 - 稳定盈利',
+    fair: '⚠️ 一般 - 需要优化',
+    poor: '❌ 较差 - 亏损超过盈利',
+    bestPerformer: '最佳表现',
+    worstPerformer: '最差表现',
+    symbolPerformance: '📊 币种表现',
+    tradeHistory: '历史成交',
+    completedTrades: '最近 {count} 笔已完成交易',
+    noCompletedTrades: '暂无完成的交易',
+    completedTradesWillAppear: '已完成的交易将显示在这里',
+    entry: '入场',
+    exit: '出场',
+    stopLoss: '止损',
+    latest: '最新',
+    trades: '笔交易',
+    usdtAverage: 'USDT 平均值',
+    avgPnL: '平均盈亏 (USDT)',
+    marginUsed: '使用保证金',
+
+    // Sharpe Ratio
+    sharpeRatio: '夏普比率',
+    sharpeRatioSubtitle: '风险调整后收益 · AI自我进化指标',
+    sharpeExcellent: '🟢 卓越表现',
+    sharpeGood: '🟢 良好表现',
+    sharpeVolatile: '🟡 波动较大',
+    sharpeNeedsAdjustment: '🔴 需要调整',
+    sharpeExcellentDesc: '✨ AI策略非常有效！风险调整后收益优异，可适度扩大仓位但保持纪律。',
+    sharpeGoodDesc: '✅ 策略表现稳健，风险收益平衡良好，继续保持当前策略。',
+    sharpeVolatileDesc: '⚠️ 收益为正但波动较大，AI正在优化策略，降低风险。',
+    sharpeNeedsAdjustmentDesc: '🚨 当前策略需要调整！AI已自动进入保守模式，减少仓位和交易频率。',
+
+    // Profit Factor Descriptions
+    profitFactorExcellentDesc: '🔥 盈利能力出色！每亏1元能赚{factor}元，AI策略表现优异。',
+    profitFactorGoodDesc: '✓ 策略稳定盈利，盈亏比健康，继续保持纪律性交易。',
+    profitFactorFairDesc: '⚠️ 策略略有盈利但需优化，AI正在调整仓位和止损策略。',
+    profitFactorPoorDesc: '❌ 平均亏损大于盈利，需要调整策略或降低交易频率。',
+
+    // Duration
+    hour: '小时',
+    minute: '分',
+    second: '秒',
+
+    // AI Learning Description
+    howAILearns: '💡 AI如何学习和进化',
+    aiLearningPoint1: '每次决策前分析最近20个交易周期',
+    aiLearningPoint2: '识别表现最好和最差的币种',
+    aiLearningPoint3: '根据胜率优化仓位大小',
+    aiLearningPoint4: '避免重复过去的错误',
+
+    // Loading & Error
+    loading: '加载中...',
+    loadingError: '⚠️ 加载AI学习数据失败',
+    noCompleteData: '暂无完整交易数据（需要完成开仓→平仓的完整周期）',
+
+    // Model Chat
+    modelChat: '模型对话',
+    noChatMessagesYet: '暂无对话消息',
+    chatWillAppear: 'AI决策对话将在此显示',
+    decisionActions: '决策行动',
+    accountState: '账户状态',
+    actions: '个行动',
+    filter: '筛选',
+    allModels: '全部模型',
+    showingRecentMessages: '显示最近',
+    messages: '条消息',
+    allModelsChatFeed: '全部模型对话流 · 实时更新',
+    showMore: '显示更多',
+    showLess: '显示更少',
+
+    // Tabs
+    leaderboardTab: '排行榜',
+    positionsTab: '持仓',
+    chatTab: '对话',
+    
+    // Positions specific
+    totalUnrealizedPnL: '总未实现盈亏',
+    noActivePositionsCompetition: '竞赛中无活跃持仓',
+    view: '查看',
+    notional: '名义价值',
+    exitPlan: '退出计划',
+    unrealizedPnLShort: '未实现盈亏',
+    availableCash: '可用资金',
+  }
+};
+
+export function t(key: string, lang: Language, params?: Record<string, string | number>): string {
+  let text = translations[lang][key as keyof typeof translations['en']] || key;
+
+  // Replace parameters like {count}, {gap}, etc.
+  if (params) {
+    Object.entries(params).forEach(([param, value]) => {
+      text = text.replace(`{${param}}`, String(value));
+    });
+  }
+
+  return text;
+}
