@@ -21,7 +21,7 @@ interface AggregatedMessage {
 
 export function CompetitionModelChat({ 
   traderIds, 
-  maxMessages = 50, 
+  maxMessages: _maxMessages = 50, 
   autoRefresh = true 
 }: CompetitionModelChatProps) {
   const { language } = useLanguage();
@@ -244,7 +244,6 @@ export function CompetitionModelChat({
             // Show More button
             const modelKey = item.modelKey!;
             const isModelExpanded = expandedModels.has(modelKey);
-            const trader = competition?.traders?.find(t => t.trader_id === item.traderId);
             const traderColor = competition?.traders && item.traderId
               ? getTraderColor(competition.traders, item.traderId)
               : '#848E9C';
