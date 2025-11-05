@@ -405,13 +405,71 @@ func buildSystemPromptWithFallback(accountEquity float64, btcEthLeverage, altcoi
 	template, err := GetPromptTemplate(templateName)
 	if err == nil && template != nil && template.Content != "" {
 		// Use template from prompt_manager (upstream method) as default
+		// IMPORTANT: Append JSON format specification to ensure AI uses correct action format
+		// Templates may use buy_to_enter/sell_to_enter, but validation expects open_long/open_short
 		log.Printf("✓ 使用提示词模板: %s (upstream方法)", templateName)
-		return template.Content
+		return buildSystemPromptWithTemplate(template.Content, accountEquity, btcEthLeverage, altcoinLeverage, minPositionSizeUSD, maxPositionSizeUSD)
 	}
 	
 	// Fallback to existing buildSystemPrompt behavior if template is nil/not found
 	log.Printf("⚠️  提示词模板 '%s' 不可用，回退到内置prompt构建方法: %v", templateName, err)
 	return buildSystemPrompt(accountEquity, btcEthLeverage, altcoinLeverage, minPositionSizeUSD, maxPositionSizeUSD)
+}
+
+// buildSystemPromptWithTemplate 在模板内容后追加JSON格式说明和动态约束
+func buildSystemPromptWithTemplate(templateContent string, accountEquity float64, btcEthLeverage, altcoinLeverage int, minPositionSizeUSD, maxPositionSizeUSD float64) string {
+	var sb strings.Builder
+	
+	// 1. 添加模板内容
+	sb.WriteString(templateContent)
+	sb.WriteString("\n\n")
+	
+	// 2. 添加硬约束（风险控制）- 动态生成
+	sb.WriteString("# 硬约束（风险控制）\n\n")
+	sb.WriteString("1. 风险回报比: 必须 ≥ 1:3（冒1%风险，赚3%+收益）\n")
+	sb.WriteString("2. 最多持仓: 3个币种（质量>数量）\n")
+	
+	// 计算仓位范围
+	minAltcoinSize := accountEquity * 0.8
+	maxAltcoinSize := accountEquity * 1.5
+	minBTCETHSize := accountEquity * 5
+	maxBTCETHSize := accountEquity * 10
+	
+	// 如果配置了最小/最大仓位限制，使用配置值
+	if minPositionSizeUSD > 0 {
+		minAltcoinSize = minPositionSizeUSD
+		minBTCETHSize = minPositionSizeUSD
+	}
+	if maxPositionSizeUSD > 0 {
+		maxAltcoinSize = maxPositionSizeUSD
+		maxBTCETHSize = maxPositionSizeUSD
+	}
+	
+	sb.WriteString(fmt.Sprintf("3. 单币仓位: 山寨%.0f-%.0f U(%dx杠杆) | BTC/ETH %.0f-%.0f U(%dx杠杆)\n",
+		minAltcoinSize, maxAltcoinSize, altcoinLeverage, minBTCETHSize, maxBTCETHSize, btcEthLeverage))
+	sb.WriteString("4. 保证金: 总使用率 ≤ 90%\n\n")
+	
+	// 3. 输出格式 - 动态生成（关键：覆盖模板中的action格式）
+	sb.WriteString("# 输出格式\n\n")
+	sb.WriteString("⚠️ **CRITICAL**: 无论思维链多长，都必须以有效的JSON数组结束！\n")
+	sb.WriteString("⚠️ **如果响应长度受限，优先保证JSON数组完整输出，可以缩短思维链！**\n\n")
+	sb.WriteString("格式示例:\n\n")
+	sb.WriteString("```json\n[\n")
+	sb.WriteString(fmt.Sprintf("  {\"symbol\": \"BTCUSDT\", \"action\": \"open_short\", \"leverage\": %d, \"position_size_usd\": %.0f, \"stop_loss\": 103000, \"take_profit\": 97000, \"confidence\": 85, \"risk_usd\": 300, \"reasoning\": \"下跌趋势+MACD死叉\"},\n", btcEthLeverage, accountEquity*5))
+	sb.WriteString("  {\"symbol\": \"ETHUSDT\", \"action\": \"close_long\", \"reasoning\": \"止盈离场\"}\n")
+	sb.WriteString("]\n```\n\n")
+	sb.WriteString("**字段说明**:\n")
+	sb.WriteString("- `action`: open_long | open_short | close_long | close_short | hold | wait\n")
+	sb.WriteString("- `confidence`: 0-100（开仓建议≥75）\n")
+	sb.WriteString("- 开仓时必填: leverage, position_size_usd, stop_loss, take_profit, confidence, risk_usd, reasoning\n")
+	sb.WriteString("- 平仓/持有/等待时只需: symbol, action, reasoning\n\n")
+	sb.WriteString("**输出要求**:\n")
+	sb.WriteString("1. 先写思维链分析（可简短）\n")
+	sb.WriteString("2. 然后必须输出一个有效的JSON数组，以 `[` 开始，以 `]` 结束\n")
+	sb.WriteString("3. JSON数组必须在响应末尾，不能中断或截断\n")
+	sb.WriteString("4. 即使所有决策都是 `wait`，也要输出JSON数组: `[{\"symbol\": \"BTCUSDT\", \"action\": \"wait\", \"reasoning\": \"无强信号\"}]`\n\n")
+	
+	return sb.String()
 }
 
 // buildUserPrompt 构建 User Prompt（动态数据）
@@ -566,7 +624,79 @@ func parseFullDecisionResponse(aiResponse string, accountEquity float64, btcEthL
 	}, nil
 }
 
+// normalizeAction 规范化action字段，将AI可能使用的变体转换为标准格式
+// 支持的变体: "OPEN", "buy_to_enter", "sell_to_enter", "BUY", "SELL", "CLOSE", etc.
+func normalizeAction(action, reasoning string) string {
+	// 转换为小写以便比较
+	actionLower := strings.ToLower(strings.TrimSpace(action))
+	reasoningLower := strings.ToLower(reasoning)
+
+	// 直接映射的变体
+	actionMap := map[string]string{
+		"open":           "", // 需要根据reasoning判断
+		"buy":            "open_long",
+		"buy_to_enter":   "open_long",
+		"sell":           "open_short",
+		"sell_to_enter":  "open_short",
+		"close":          "", // 需要根据持仓判断，但通常用close_long/close_short
+		"close_position": "", // 同上
+		"long":           "open_long",
+		"short":          "open_short",
+	}
+
+	// 如果action已经是标准格式，直接返回
+	validActions := map[string]bool{
+		"open_long":   true,
+		"open_short":  true,
+		"close_long":  true,
+		"close_short": true,
+		"hold":        true,
+		"wait":        true,
+	}
+	if validActions[actionLower] {
+		return actionLower
+	}
+
+	// 检查映射表
+	if mapped, ok := actionMap[actionLower]; ok {
+		if mapped != "" {
+			return mapped
+		}
+		// 如果是"open"或"close"，需要根据reasoning判断方向
+		if actionLower == "open" {
+			// 从reasoning中查找方向关键词
+			if strings.Contains(reasoningLower, "做多") || strings.Contains(reasoningLower, "做長") ||
+				strings.Contains(reasoningLower, "long") || strings.Contains(reasoningLower, "看涨") ||
+				strings.Contains(reasoningLower, "看漲") || strings.Contains(reasoningLower, "上涨") ||
+				strings.Contains(reasoningLower, "上漲") || strings.Contains(reasoningLower, "买入") ||
+				strings.Contains(reasoningLower, "買入") || strings.Contains(reasoningLower, "buy") {
+				return "open_long"
+			}
+			if strings.Contains(reasoningLower, "做空") || strings.Contains(reasoningLower, "做短") ||
+				strings.Contains(reasoningLower, "short") || strings.Contains(reasoningLower, "看跌") ||
+				strings.Contains(reasoningLower, "下跌") || strings.Contains(reasoningLower, "卖出") ||
+				strings.Contains(reasoningLower, "賣出") || strings.Contains(reasoningLower, "sell") {
+				return "open_short"
+			}
+			// 如果无法判断，默认返回wait（保守策略）
+			log.Printf("⚠️ 警告: 无法从reasoning判断OPEN的方向，转换为wait. Action: %s, Reasoning: %s", action, reasoning)
+			return "wait"
+		}
+		if actionLower == "close" || actionLower == "close_position" {
+			// 对于close，通常需要根据持仓判断，但这里我们保守处理
+			// 如果无法判断，返回wait（实际应该由系统根据持仓判断）
+			log.Printf("⚠️ 警告: CLOSE动作需要指定方向(close_long/close_short)，转换为wait. Action: %s", action)
+			return "wait"
+		}
+	}
+
+	// 如果都不匹配，记录警告并返回wait（保守策略）
+	log.Printf("⚠️ 警告: 未知的action变体 '%s'，转换为wait. Reasoning: %s", action, reasoning)
+	return "wait"
+}
+
 // normalizeDecisions 将AI给出的position_size_usd在[min, max]范围内进行约束
+// 同时规范化action字段，将常见的变体转换为标准格式
 // 注：当maxPositionSizeUSD>0时，超出部分会被自动截断至max而不是直接拒绝，以便继续后续动作
 func normalizeDecisions(decisions []Decision, minPositionSizeUSD, maxPositionSizeUSD float64) []Decision {
     if len(decisions) == 0 {
@@ -574,7 +704,10 @@ func normalizeDecisions(decisions []Decision, minPositionSizeUSD, maxPositionSiz
     }
 
     for i := range decisions {
-        // 仅对开仓动作进行规范化
+        // 1. 规范化action字段（处理AI可能使用的变体）
+        decisions[i].Action = normalizeAction(decisions[i].Action, decisions[i].Reasoning)
+
+        // 2. 仅对开仓动作进行规范化
         if decisions[i].Action == "open_long" || decisions[i].Action == "open_short" {
             size := decisions[i].PositionSizeUSD
             // 下限：若配置了最小仓位，且size小于下限，则提升到下限
